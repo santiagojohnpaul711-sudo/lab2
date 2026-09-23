@@ -4,6 +4,7 @@ import re
 
 from constants import COUNTRY_CODES
 
+# Mga Regular na Expression(Regex) para sa pag validate sa atong mga Field
 _STUDENT_ID_RE = re.compile(r"[A-Z0-9][A-Z0-9\-]*")
 _NAME_RE = re.compile(r"[A-Za-z' \-]+")
 _OCCUPATION_RE = re.compile(r"[A-Za-z0-9 .'\-/]+")
@@ -12,7 +13,7 @@ _LOCAL_NUMBER_RE = re.compile(r"\d+")
 
 
 class Contact:
-    """Represent one contact stored by the ASEAN Phonebook."""
+    """It represents sa usa ka contact nga makita sa ASEAN Phonebook."""
 
     def __init__(
         self,
@@ -24,7 +25,7 @@ class Contact:
         area_code: str,
         local_number: str,
     ) -> None:
-        """Store all seven contact fields without changing their text."""
+        """I-save ang 7 ka field sa contact nga dili i change ang original text."""
         self.student_id = student_id
         self.surname = surname
         self.given_name = given_name
@@ -34,19 +35,16 @@ class Contact:
         self.local_number = local_number
 
     def phone_number(self) -> str:
-        """Return the complete phone number as code-area-local."""
+        """I-return ang complite numbers sa telephone nga naka format nga country-area-local."""
         return f"{self.country_code}-{self.area_code}-{self.local_number}"
 
     def sort_key(self) -> tuple[str, str, str]:
-        """Return the surname, given-name, and student-ID sorting key.
-
-        Name comparison must ignore capitalization, but the original stored
-        spelling must remain unchanged.
+        """I-return ang container sa surname, given name, ug student ID para sa pag-alphabetize. Naka-lowercase ang mga ngalan para sa comparison aron dili mausab ang original nga data.
         """
         return (self.surname.lower(), self.given_name.lower(), self.student_id)
 
     def get_field(self, field: str) -> str:
-        """Return the current value of one supported UPDATE field."""
+        """I-return ang bag-ong value sa gi-update nga field."""
         field_map = {
             "ID": self.student_id,
             "SURNAME": self.surname,
@@ -59,10 +57,7 @@ class Contact:
         return field_map[field]
 
     def copy_with_update(self, field: str, new_value: str) -> Contact:
-        """Return a proposed Contact containing one field change.
-
-        Do not modify the current Contact. The proposed Contact is checked
-        first so a failed UPDATE can leave the linked list unchanged.
+        """Mag-make ug mag-return og new instance sa Contact nga gi-update ang usa ka field. Dili i-modify ang existing Contact aron safe ang linked list kon mag-fail ang validation.
         """
         values = {
             "student_id": self.student_id,
@@ -86,7 +81,7 @@ class Contact:
         return Contact(**values)
 
     def __str__(self) -> str:
-        """Return the exact readable contact format required by the project."""
+        """I-return ang gikinahanglan nga format sa contact para sa output sa project."""
         country_name = COUNTRY_CODES.get(self.country_code, self.country_code)
         return (
             f"{self.student_id} - {self.surname}, {self.given_name} - "
@@ -95,14 +90,14 @@ class Contact:
 
 
 def is_valid_student_id(value: str) -> bool:
-    """Return True when value follows the published student-ID rules."""
+    """I-return ang True kong valid ang student ID format ug length."""
     if not (1 <= len(value) <= 20):
         return False
     return _STUDENT_ID_RE.fullmatch(value) is not None
 
 
 def is_valid_name(value: str) -> bool:
-    """Return True when value is a valid surname or given name."""
+    """I-return ang True kong ang value sakto nga surname o given name format."""
     if not (1 <= len(value) <= 40):
         return False
     if value != value.strip():
@@ -111,7 +106,7 @@ def is_valid_name(value: str) -> bool:
 
 
 def is_valid_occupation(value: str) -> bool:
-    """Return True when value follows the published occupation rules."""
+    """I-return ang True kong ang value nagsunod sa rules para sa occupation."""
     if not (1 <= len(value) <= 60):
         return False
     if value != value.strip():
@@ -120,24 +115,23 @@ def is_valid_occupation(value: str) -> bool:
 
 
 def is_valid_area_code(value: str) -> bool:
-    """Return True for an area code containing 1 to 6 digits."""
+    """I-return ang True kong ang area code naay sa 1 hangtod 6 ka digits."""
     if not (1 <= len(value) <= 6):
         return False
     return _AREA_CODE_RE.fullmatch(value) is not None
 
 
 def is_valid_local_number(value: str) -> bool:
-    """Return True for a local number containing 3 to 12 digits."""
+    """"I-return ang True kong ang local number naay sa 3 hangtod 12 ka digits."""""
     if not (3 <= len(value) <= 12):
         return False
     return _LOCAL_NUMBER_RE.fullmatch(value) is not None
 
 
 def validate_contact(contact: Contact) -> str | None:
-    """Return the first required validation error, or None when valid.
-
-    Check fields from left to right using the order published in the project
-    definition. COUNTRY_CODE uses ERROR INVALID_COUNTRY <value>.
+    """I-return ang unang validation error message, o None kong valid ang tanang field.
+    I-check ang mga field gikan sa wala padulong sa tuo sumala sa order sa project specs.
+    Ang COUNTRY_CODE mogamit sa format nga ERROR INVALID_COUNTRY <value>.
     """
     if not is_valid_student_id(contact.student_id):
         return "ERROR INVALID_VALUE STUDENT_ID"
