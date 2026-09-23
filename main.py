@@ -162,6 +162,3 @@ def main() -> None:
     if output:
         print(output)
 
-
-if __name__ == "__main__":
-    main()
